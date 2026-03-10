@@ -10,6 +10,7 @@ boolean started = false;
 int randcar = 1;
 int p = 0;
 
+int y = 0;
 
 
 float r1 = random(0, 255);
@@ -18,7 +19,7 @@ float b1 = random(0, 255);
 
 int z = 0;
 boolean s = false;
-
+boolean eye_open = false;
 
 void setup() {
   size(900, 900);
@@ -47,22 +48,22 @@ void draw() {
   movex = random(2);
 
 
-  x = camMove(x, randmove, movex, randcar);
-  camera(50, 300, x);
+  x = camMove(x, randmove, movex, randcar, eye_open);
+  camera(50, 300, x, y);
 
-  x = camMove(x, randmove, movex, randcar);
-  camera(250, 300, x);
-
-
-  x = camMove(x, randmove, movex, randcar);
-  camera(450, 300, x);
+  x = camMove(x, randmove, movex, randcar, eye_open);
+  camera(250, 300, x, y);
 
 
-  x = camMove(x, randmove, movex, randcar);
-  camera(650, 300, x);
+  x = camMove(x, randmove, movex, randcar, eye_open);
+  camera(450, 300, x, y);
 
-  x = camMove(x, randmove, movex, randcar);
-  camera(850, 300, x);
+
+  x = camMove(x, randmove, movex, randcar, eye_open);
+  camera(650, 300, x, y);
+
+  x = camMove(x, randmove, movex, randcar, eye_open);
+  camera(850, 300, x, y);
 
 
   carmovement -= 15;
@@ -81,20 +82,26 @@ void draw() {
   if (z >= 50) {
     s = false;
     time = time +1;
+    eye_open = true;
+
     if (time>3500) {
       z =0;
       time  = 0;
+      eye_open = false;
     }
   } else if (time > 3000) {
     s = true;
+    eye_open = true;
   } else {
     s = false;
     z = 0;
     time +=1;
+    eye_open = false;
   }
 
   if (s == true) {
     z+=1;
+    eye_open = true;
   }
 }
 
@@ -140,7 +147,7 @@ void wall() {
 
 
 
-void camera(int Camx, int Camy, float x) {
+void camera(int Camx, int Camy, float x, int y) {
   pushMatrix();
   translate(Camx, Camy);
 
@@ -155,13 +162,13 @@ void camera(int Camx, int Camy, float x) {
 
 
   fill(90);
-  rect(x, -20, 40, 40);
-  quad(x, -20, 15, -40, 45, -40, x+40, -20);
-  quad(x+40, -20, x+40, 20, 45, 0, 45, -40);
-  quad(x, -20, x, 20, 15, 0, 15, -40);
+  rect(x, y-20, 40, 40);
+  quad(x, y-20, 15, -40, 45, -40, x+40, y-20);
+  quad(x+40, y-20, x+40, y+20, 45, 0, 45, -40);
+  quad(x, y-20, x, y+20, 15, 0, 15, -40);
 
   fill(0);
-  ellipse(x+20, 0, 20, 20);
+  ellipse(x+20, y, 20, 20);
 
   if (randcar ==0 && time%2 ==0) {
     fill(255, 0, 0);
@@ -176,30 +183,45 @@ void camera(int Camx, int Camy, float x) {
 
 
 
-float camMove(float x, float rand, float speed, int randomcar) {
+float camMove(float x, float rand, float speed, int randomcar, boolean eye) {
 
   float save = x;
   speed = random(2);
 
 
-  if (rand < 0) {
-    x = x+ speed/2;
-  } else {
-    x = x- speed/2;
-  }
-  if (x <-20) {
-    x = -19;
-  }
-  if (randomcar == 0) {
+  if (eye == true) {
+    y = -20;
+    x =0;
+    return 0;
+  } else if (randomcar == 0) {
+
+    if (rand < 0) {
+      x = x+ speed/2;
+    } else {
+      x = x- speed/2;
+    }
+    if (x <-20) {
+      x = -19;
+    }
+    y = 0;
     x = 30 - p;
     if (time % 5 ==0) {
       p = p+1;
-    }
-    else if (p>80){
+    } else if (p>80) {
       p = 0;
     }
     return x;
   } else if (p >50 || randomcar !=0) {
+
+    if (rand < 0) {
+      x = x+ speed/2;
+    } else {
+      x = x- speed/2;
+    }
+    if (x <-20) {
+      x = -19;
+    }
+    y = 0;
     p =0;
     if (x > 30) {
       x = save;
@@ -209,6 +231,7 @@ float camMove(float x, float rand, float speed, int randomcar) {
       }
       return x;
     } else if (x < -20) {
+      
       x = save;
       if (second()%5 == 0) {
         rand = -1;
